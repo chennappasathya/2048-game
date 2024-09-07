@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048 Game</title>
+    <style>
+      *{
+        margin:0;
+        padding:0;
+      }
+      body{
+        background: rgba(165, 42, 42, 0.212);
+      }
+        h1{
+            color:red;
+            text-align: center;
+            text-shadow: 2px 2px 3px red;
+            font-size:50px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color:green;
+            color:white;
+            border-radius: 5px;
+            cursor: pointer;
+           margin-left:550px;
+           
+        }
+        .score {
+           font-weight: bold;
+           font-size:30px;
+           text-align:center;
+           padding:10px;
+        }
+        .game-container {
+           width:700px;
+           height:730px;
+           background: aqua;
+           margin:auto;
+           margin-top:30px;
+          
+          box-shadow: 4px 4px 4px 4px rgb(255, 0, 179),-4px -4px 4px 4px rgb(255, 0, 179);
+          border-radius: 20px;    
+
+        }
+        .grid-container {
+            width: 400px;
+            height: 380px;
+            background-color:brown;
+            border-radius: 10px;
+            padding: 10px;
+            margin-left:130px;
+        }
+        .grid {
+            display: grid;
+            grid-template-rows: 80px 80px 80px 80px;
+            grid-template-columns: 80px 80px 80px 80px;
+            gap: 5px;
+            margin-left:30px;
+            margin-top:15px;
+        }
+        
+        .tile {
+            background-color: #cdc1b4;
+            border-radius: 5px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 25px;
+            font-weight: bold; 
+        }
+        .tile-2 {
+            background:lightpink;
+            color:white;
+             }
+        .tile-4 { 
+            background:lightyellow;
+            color:black;
+         }
+        .tile-8 { 
+            background:lightblue;
+            color:white;
+         }
+        .tile-16 { 
+            background:lightgreen;
+            color:white;
+        }
+        
+        .tile-32 { 
+            background:violet;
+            color:white;
+        } 
+        .tile-64 { 
+            background:rgb(24,45,67);
+            color:white;
+        }
+        .tile-128 {
+            background:rgb(200,200,34);
+            color:white;
+        }
+        .tile-256 { 
+            background:rgb(50,50,50);
+            color:white;
+        }
+        .tile-512 { 
+            background:rgb(50,100,100);
+            color:white;
+         }
+        .tile-1024 {
+            background:rgb(100,200,100);
+            color:white;
+            }
+        .tile-2048 {
+            background:lightslategrey;
+            color:white;
+            }  
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>2048 game</h1>
+        <div class="score-container">
+            <hr>
+            <div class="score">Score: <span id="score">0</span></div>
+        </div>
+        <button id="newGameButton">New Game</button>
+        <div class="grid-container">
+            <div class="grid">
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+            </div>
+        </div>
+    </div>
+    
+<script>
+const gridContainer = document.querySelector('.grid');
+let tiles = Array.from(gridContainer.querySelectorAll('.tile'));
+let score = 0;
+
+document.addEventListener('keydown', handleKeyPress);
+document.getElementById('newGameButton').addEventListener('click', startNewGame);
+
+function handleKeyPress(event) {
+  if (event.key.includes('Arrow')) {
+    event.preventDefault();
+    move(event.key.replace('Arrow', '').toLowerCase());
+    updateGrid();
+  }
+}
+
+function move(direction) {
+  switch (direction) {
+    case 'up':
+      moveUp();
+      break;
+    case 'down':
+      moveDown();
+      break;
+    case 'left':
+      moveLeft();
+      break;
+    case 'right':
+      moveRight();
+      break;
+  }
+}
+
+function moveUp() {
+  for (let col = 0; col < 4; col++) {
+    let column = tiles.filter((tiles, index) => index % 4 === col);
+    column = mergeTiles(column);
+    for (let i = 0; i < column.length; i++) {
+      tiles[i * 4 + col].textContent = column[i] || '';
+      console.log(col)
+    }
+  }
+}
+
+function moveDown() {
+  for (let col = 0; col < 4; col++) {
+    let column = tiles.filter((tile, index) => index % 4 === col);
+    column = mergeTiles(column.reverse());
+    for (let i = 0; i < column.length; i++) {
+      tiles[(3 - i) * 4 + col].textContent = column[i] || '';
+    }
+  }
+}
+
+function moveLeft() {
+  for (let row = 0; row < 4; row++) {
+    let rowTiles = tiles.slice(row * 4, (row + 1) * 4);
+    rowTiles = mergeTiles(rowTiles);
+    for (let i = 0; i < rowTiles.length; i++) {
+      tiles[row * 4 + i].textContent = rowTiles[i] || '';
+    }
+  }
+}
+
+function moveRight() {
+  for (let row = 0; row < 4; row++) {
+    let rowTiles = tiles.slice(row * 4, (row + 1) * 4);
+    rowTiles = mergeTiles(rowTiles.reverse());
+    for (let i = 0; i < rowTiles.length; i++) {
+      tiles[row * 4 + (3 - i)].textContent = rowTiles[i] || '';
+    }
+  }
+}
+
+function mergeTiles(tiles) {
+  let merged = [];
+  for (let i = 0; i < tiles.length; i++) {
+    if (tiles[i].textContent !== '') {
+      if (merged.length > 0 && merged[merged.length - 1] === tiles[i].textContent) {
+        merged[merged.length - 1] = (parseInt(merged[merged.length - 1]) * 2).toString();
+        score += parseInt(merged[merged.length - 1]);
+      } else {
+        merged.push(tiles[i].textContent);
+      }
+    }
+  }
+  while (merged.length < 4) {
+    merged.push('');
+  }
+  return merged;
+}
+
+function updateGrid() {
+  document.getElementById('score').textContent = score;
+  tiles.forEach(updateTileClass);
+  generateTile();
+}
+
+function startNewGame() {
+  score = 0;
+  document.getElementById('score').textContent = score;
+  tiles.forEach(tile => {
+    tile.textContent = '';
+    updateTileClass(tile);
+  });
+  generateTile();
+  generateTile();
+}
+
+function generateTile() {
+  const emptyTiles = tiles.filter(tile => tile.textContent === '');
+  if (emptyTiles.length === 0) return;
+  const randomTile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+  randomTile.textContent = Math.random() < 9 ? '2' : '4';
+  updateTileClass(randomTile);
+}
+
+function updateTileClass(tile) {
+  tile.className = 'tile'; 
+  if (tile.textContent) {
+    tile.classList.add('tile-' + tile.textContent);
+  }
+}
+
+startNewGame();
+ 
+
+</script>
+</body>
+</html>
